@@ -1,0 +1,41 @@
+version: '3.9'
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: admin
+    expose:
+      - "5433" # Publishes 5433 to other containers but NOT to host machine
+    ports:
+      - "5433:5432"
+    volumes:
+      - "./backups:/home/backups"
+      - "./postgres/postgres.conf:/usr/local/etc/postgres/postgres.conf"
+      - "./postgres/data:/var/lib/postgresql/data:delegated"
+  #  mysql:
+  #    image: mysql:5.7
+  #    ports:
+  #      - "3307:3306"
+  ##    expose:
+  ##      - "3307"
+  #    volumes:
+  #      - /apps/mysql/var/lib/mysql
+  #    environment:
+  #      - MYSQL_ROOT_PASSWORD=S3cret
+  #      - MYSQL_PASSWORD=An0thrS3crt
+  #      - MYSQL_USER=user
+  #      - MYSQL_DATABASE=snapp
+  redis:
+    image: bitnami/redis:latest
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    networks:
+      - app-network
